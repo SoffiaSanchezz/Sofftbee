@@ -510,16 +510,20 @@ class LocalDBService {
     if (kIsWeb) {
       final box = await hiveBox;
       final id = DateTime.now().millisecondsSinceEpoch;
+      data['id'] = id; // Add the generated ID to the data map
       await box.put('monitoreo_$id', data);
       return id;
     } else {
       final db = await database;
-      return await db!.insert('monitoreos', {
-        'colmena_id': data['colmena'],
+      debugPrint('💾 Intentando insertar monitoreo localmente: $data');
+      final insertedId = await db!.insert('monitoreos', {
+        'colmena_id': data['colmena_id'],
         'apiario_id': data['id_apiario'],
         'fecha': data['fecha'],
         'sincronizado': 0,
       });
+      debugPrint('✅ Monitoreo local insertado con ID: $insertedId');
+      return insertedId;
     }
   }
 
@@ -558,16 +562,19 @@ class LocalDBService {
     if (kIsWeb) {
       final box = await hiveBox;
       final data = box.toMap();
-      return data.entries
+      final pendientesWeb = data.entries
           .where((e) => e.key.toString().startsWith('monitoreo_'))
           .map((e) => Map<String, dynamic>.from(e.value))
           .toList();
+      debugPrint('🔍 Encontrados ${pendientesWeb.length} monitoreos pendientes (web).');
+      return pendientesWeb;
     } else {
       final db = await database;
       final monitoreos = await db!.query(
         'monitoreos',
         where: 'sincronizado = 0',
       );
+      debugPrint('🔍 Encontrados ${monitoreos.length} monitoreos pendientes (SQLite).');
 
       List<Map<String, dynamic>> result = [];
       for (var monitoreo in monitoreos) {

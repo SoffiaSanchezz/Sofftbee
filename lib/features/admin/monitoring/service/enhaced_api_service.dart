@@ -573,6 +573,10 @@ class EnhancedApiService {
         'datos_adicionales': datosAdicionales,
       };
 
+      debugPrint('➡️ Enviando POST a: $_baseUrl/monitoreos');
+      debugPrint('Payload: ${json.encode(body)}');
+      debugPrint('Headers: ${await _headers}');
+
       final response = await http
           .post(
             Uri.parse('$_baseUrl/monitoreos'),
@@ -581,8 +585,12 @@ class EnhancedApiService {
           )
           .timeout(_timeout);
 
+      debugPrint('⬅️ Respuesta recibida para POST /monitoreos. Status: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+
       if (response.statusCode == 201) {
         final result = json.decode(response.body);
+        debugPrint('✅ Backend respondió 201 para monitoreo. Body: $result');
         return result['id'];
       } else {
         throw Exception(

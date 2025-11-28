@@ -5,6 +5,8 @@
     <!-- PERMISO PARA ACCESO A LA BIBLIOTECA DE FOTOS -->
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Para seleccionar una foto de perfil</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Esta aplicación necesita acceso a la cámara para tomar fotos para tu perfil.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Necesitamos tu ubicación para mostrar los apiarios cercanos</string>
 	<key>NSSpeechRecognitionUsageDescription</key>

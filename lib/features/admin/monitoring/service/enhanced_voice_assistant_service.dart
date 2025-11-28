@@ -641,8 +641,8 @@ class EnhancedVoiceAssistantService {
       _updateStatus("Guardando datos...");
 
       final data = {
-        'colmena': selectedColmena!,
-        'id_apiario': selectedApiario!.id,
+        'colmena_id': selectedColmena!,
+        'apiario_id': selectedApiario!.id,
         'fecha': DateTime.now().toIso8601String(),
         'respuestas': respuestas.map((r) => r.toJson()).toList(),
       };
@@ -697,7 +697,7 @@ class EnhancedVoiceAssistantService {
 
   void _syncInBackground() async {
     try {
-      if (await EnhancedApiService.hasInternetConnection()) {
+      if (await EnhancedApiService.verificarConexion()) {
         final pendientes = await dbService.getMonitoreosPendientes();
         if (pendientes.isNotEmpty) {
           debugPrint(
@@ -706,8 +706,8 @@ class EnhancedVoiceAssistantService {
           for (var monitoreoData in pendientes) {
             try {
               final serverId = await EnhancedApiService.createMonitoreo(
-                idColmena: monitoreoData['colmena_id'],
-                idApiario: monitoreoData['apiario_id'],
+                idColmena: (monitoreoData['colmena_id'] as int?) ?? 0,
+                idApiario: (monitoreoData['apiario_id'] as int?) ?? 0,
                 fecha: monitoreoData['fecha'],
                 respuestas: (monitoreoData['respuestas'] as List)
                     .map((r) => Map<String, dynamic>.from(r))
@@ -1036,13 +1036,17 @@ class EnhancedVoiceAssistantService {
 
   void _updateStatus(String status) {
     currentMessage = status;
-    statusController.add(status);
+    if (!statusController.isClosed) {
+      statusController.add(status);
+    }
     debugPrint("📢 Estado Maya: $status");
   }
 
   void _updateListeningState(bool listening) {
     isListening = listening;
-    listeningController.add(listening);
+    if (!listeningController.isClosed) {
+      listeningController.add(listening);
+    }
   }
 
   void dispose() {
